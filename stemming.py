@@ -21,3 +21,45 @@ Your goal is to:
 
 Write your code below this string.
 """
+
+import re
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+
+# nltk.download('punkt')
+# nltk.download('punkt_tab') 
+# nltk.download('stopwords')
+
+with open('story1.txt', 'r') as file:
+    text_input = file.read()
+
+# Step 2: Remove URLs and HTML tags using regex
+text_cleaned = re.sub(r'http\S+|<.*?>', '', text_input)
+# print(text_cleaned)
+
+# Step 3: Remove hastags, asterisks, and excess punctuation
+
+text_cleaned = re.sub(r'[#\*]', '', text_cleaned)
+text_cleaned  = re.sub(r'[!?\.]{2,}', '', text_cleaned)
+# print(text_cleaned)
+
+# Step 4: Remove extra whitespace
+
+text_cleaned = re.sub(r'\s+', ' ', text_cleaned).strip()
+# print(text_cleaned)
+
+# Step 5: Tokenize the text into words
+tokens = word_tokenize(text_cleaned)
+# print(tokens)
+
+# Step 6: Remove stopwords
+stop_words = set(stopwords.words('english'))
+filtered_tokens = [w for w in tokens if w.lower() not in stop_words]
+# print(filtered_tokens)
+
+# Step 7: Apply stemming 
+ps = PorterStemmer()
+stemmed_words = [ps.stem(w) for w in filtered_tokens]
+print(stemmed_words)

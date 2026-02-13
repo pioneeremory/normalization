@@ -22,3 +22,49 @@ Your goal is to:
 
 Write your code below this string.
 """
+import re
+import nltk
+from nltk import pos_tag
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords, wordnet
+from nltk.stem import WordNetLemmatizer, PorterStemmer
+
+lemmatizer = WordNetLemmatizer()
+
+def get_wordnet_pos(treebank_tag):
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('N'):
+        return wordnet.NOUN
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN  # Default to noun if unknown
+
+with open('story2.txt', 'r') as file:
+    text_input = file.read()
+
+# 3. Regex Noise Removal
+text_input = re.sub(r'<[^>]+>', '', text_input)  # HTML tags
+text_input = re.sub(r'https?://\S+|www\.\S+', '', text_input)  # URLs
+text_input = re.sub(r'[#\*]', '', text_input)  # Hashtags and asterisks
+text_input = re.sub(r'[!?\.]{2,}', '', text_input)  # Excessive punctuation
+clean_text = re.sub(r'\s+', ' ', text_input).strip() # Extra whitespace
+
+tokens = word_tokenize(clean_text)
+
+stop_words = set(stopwords.words('english'))
+stopwords_removed = [w for w in tokens if w.lower() not in stop_words]
+
+tagged_words = pos_tag(stopwords_removed)
+
+print(tagged_words)
+
+lemmatized_words_with_pos = [
+    lemmatizer.lemmatize(word, get_wordnet_pos(pos_tag))
+    for word, pos_tag in tagged_words
+]
+
+print(lemmatized_words_with_pos)
